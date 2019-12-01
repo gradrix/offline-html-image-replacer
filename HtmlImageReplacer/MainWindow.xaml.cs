@@ -14,13 +14,13 @@ namespace OfflineHtmlImageReplacer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string _programLocation;
+        private readonly string _programLocation;
         private string _html;
         private string _htmlFilePath;
         private string _imgFilePath;
         private string _backupHtmlFilePath;
-        private string[] _imgExtensions = { ".jpg", ".jpeg", ".jpe", ".jfif", ".png", ".gif", ".ico", ".bmp" };
-        private string[] _htmlExtensions = { ".html", ".htm" };
+        private readonly string[] _imgExtensions = { ".jpg", ".jpeg", ".jpe", ".jfif", ".png", ".gif", ".ico", ".bmp" };
+        private readonly string[] _htmlExtensions = { ".html", ".htm" };
 
         public MainWindow()
         {
@@ -28,7 +28,6 @@ namespace OfflineHtmlImageReplacer
             LoadSettings();
 
             _programLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            ErrorTextBlock.Visibility = Visibility.Hidden;
         }
 
         private void CreateBackup()
@@ -86,11 +85,32 @@ namespace OfflineHtmlImageReplacer
                 HtmlFileLocationLabel.Text = openFileDialog.FileName;
                 _html = File.ReadAllText(openFileDialog.FileName);
                 _htmlFilePath = openFileDialog.FileName;
+                HideMessages();
                 AppSettings.Default.HtmlLocation = _htmlFilePath;
                 AppSettings.Default.Save();
 
                 CreateBackup();
-                ErrorTextBlock.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void ChooseImgButton_Click(object sender, RoutedEventArgs e)
+        {
+            var imageExtensions = _imgExtensions.Select(ex => "*" + ex);
+            var imageExtensionsLabel = string.Join(", ", imageExtensions);
+            var imageExtensionsFilter = string.Join("; ", imageExtensions);
+            var openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = GetImgFileDirectory(),
+                Filter = $"Image files ({imageExtensionsLabel}) | {imageExtensionsFilter}"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                ImgFileLocationTextBlock.Text = openFileDialog.FileName;
+                _imgFilePath = openFileDialog.FileName;
+                HideMessages();
+                AppSettings.Default.ImgLocation = _imgFilePath;
+                AppSettings.Default.Save();
             }
         }
 
@@ -109,27 +129,6 @@ namespace OfflineHtmlImageReplacer
             }
 
             return Path.GetDirectoryName(_programLocation);
-        }
-
-        private void ChooseImgButton_Click(object sender, RoutedEventArgs e)
-        {
-            var imageExtensions = _imgExtensions.Select(ex => "*" + ex);
-            var imageExtensionsLabel = string.Join(", ", imageExtensions);
-            var imageExtensionsFilter = string.Join("; ", imageExtensions);
-            var openFileDialog = new OpenFileDialog
-            {
-                InitialDirectory = GetImgFileDirectory(),
-                Filter = $"Image files ({imageExtensionsLabel}) | {imageExtensionsFilter}"
-            };
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                ImgFileLocationTextBlock.Text = openFileDialog.FileName;
-                _imgFilePath = openFileDialog.FileName;
-                ErrorTextBlock.Visibility = Visibility.Visible;
-                AppSettings.Default.ImgLocation = _imgFilePath;
-                AppSettings.Default.Save();
-            }
         }
 
         private string GetImgFileDirectory()
@@ -153,7 +152,7 @@ namespace OfflineHtmlImageReplacer
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                ErrorTextBlock.Visibility = Visibility.Visible;
+                HideMessages();
 
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 var fullFilePath = files[0];
@@ -181,7 +180,7 @@ namespace OfflineHtmlImageReplacer
                     else
                     {
                         var allowedExtensions = string.Join(", ", _imgExtensions.Select(ex => "*"+ ex));
-                        allowedExtensions += string.Join(", ", _htmlExtensions.Select(ex => "*" + ex));
+                        allowedExtensions += ", " + string.Join(", ", _htmlExtensions.Select(ex => "*" + ex));
                         ShowError($"Only {allowedExtensions} extensions are allowed!");
                     }
                 }
@@ -195,8 +194,13 @@ namespace OfflineHtmlImageReplacer
         private void ShowError(string error)
         {
             ErrorTextBlock.Visibility = Visibility.Visible;
-            ErrorTextBlock.Foreground = new SolidColorBrush(Colors.Red);
             ErrorTextBlock.Text = error;
+        }
+
+        private void HideMessages()
+        {
+            SuccessTextBlock.Visibility = Visibility.Hidden;
+            ErrorTextBlock.Visibility = Visibility.Hidden;
         }
 
         private void Grid_DragOver(object sender, DragEventArgs e)
@@ -206,27 +210,39 @@ namespace OfflineHtmlImageReplacer
 
         private void ResetHtmlButton_Click(object sender, RoutedEventArgs e)
         {
+            HideMessages();
+
             if (!string.IsNullOrEmpty(_backupHtmlFilePath) && !string.IsNullOrEmpty(_htmlFilePath))
             {
                 if (File.Exists(_backupHtmlFilePath))
                 {
                     File.Copy(_backupHtmlFilePath, _htmlFilePath, true);
                     _html = File.ReadAllText(_htmlFilePath);
+                    SuccessTextBlock.Text = "HTML file was restored to its original state.";
+                    SuccessTextBlock.Visibility = Visibility.Visible;
                 }
             }
         }
 
         private void TestHtmlButton_Click(object sender, RoutedEventArgs e)
         {
+            HideMessages();
+
             if (!string.IsNullOrEmpty(_htmlFilePath))
             {
+                ErrorTextBlock.Visibility = Visibility.Hidden;
                 System.Diagnostics.Process.Start(_htmlFilePath);
+            }
+            else
+            {
+                ShowError("No HTML to test..");
             }
         }
 
         private void ReplaceButton_Click(object sender, RoutedEventArgs e)
         {
-            ErrorTextBlock.Visibility = Visibility.Hidden;
+            HideMessages();
+
             if (string.IsNullOrEmpty(_html))
             {
                 ShowError("HTML File was not chosen!");
@@ -253,6 +269,7 @@ namespace OfflineHtmlImageReplacer
                     var oldImgLocations = Regex.Matches(_html, OldImgNameTextBox.Text)
                         .Cast<Match>()
                         .Select(m => m.Index)
+                        .OrderByDescending(x => x)
                         .ToList();
                     
                     if (oldImgLocations.Count == 0)
@@ -261,37 +278,39 @@ namespace OfflineHtmlImageReplacer
                     }
                     else
                     {
-                        var didReplaceSomething = false;
                         string errors = null;
-                        var index = 1;
+                        string replaces = null;
+                        var index = -1;
                         foreach (var oldImgLocation in oldImgLocations)
                         {
+                            index++;
                             var httpBeginning = _html.LastIndexOf("http", oldImgLocation);
                             var relBeginning = _html.LastIndexOf("./", oldImgLocation);
                             var beginning = httpBeginning > relBeginning ? httpBeginning : relBeginning;
-                            var ending = _html.IndexOf(extension, oldImgLocation);
+                            var ending = _html.IndexOf(extension, beginning + OldImgNameTextBox.Text.Length);
 
                             if (beginning != -1 && ending != -1)
                             {
                                 ending += extension.Length;
                                 ending = ExcludeUriEnding(ending);
                                 ReplaceImage(beginning, ending);
-                                didReplaceSomething = true;
+                                replaces += $"{index}, ";
                                 continue;
                             }
                             errors += $"{index}, ";
-                            index++;
                         }
 
-                        if (didReplaceSomething)
+                        if (!string.IsNullOrEmpty(replaces))
                         {
                             File.WriteAllText($@"{_htmlFilePath}", _html);
+                            SuccessTextBlock.Text = $"Successfully replaced in search indexes: {replaces}";
+                            SuccessTextBlock.Visibility = Visibility.Visible;
                             AppSettings.Default.ReplaceImg = OldImgNameTextBox.Text;
                             AppSettings.Default.Save();
                         }
 
                         if (!string.IsNullOrEmpty(errors))
-                            ShowError($"Failed to find image beginning/ending in occurences: {errors}");
+                            ShowError($"Failed to find image beginning/ending in indexes: {errors}");
                     }
                 }
             }
@@ -300,7 +319,7 @@ namespace OfflineHtmlImageReplacer
         private int ExcludeUriEnding(int ending)
         {
             var res = ending;
-            var nextChar = _html[ending ];
+            var nextChar = _html[ending];
             if (nextChar == '?')
             {
                 res = _html.Length;
@@ -326,12 +345,10 @@ namespace OfflineHtmlImageReplacer
             var uri = new Uri(_imgFilePath);
             var imgFileUri = uri.AbsoluteUri;
             var sBuilder = new StringBuilder(_html);
+            Console.WriteLine($"Removing: {(_html.Substring(start, end - start))}");
             sBuilder.Remove(start, end - start);
             sBuilder.Insert(start, imgFileUri);
             _html = sBuilder.ToString();
-            ErrorTextBlock.Foreground = new SolidColorBrush(Colors.Green);
-            ErrorTextBlock.Text = "Success!";
-            ErrorTextBlock.Visibility = Visibility.Visible;
         }
     }
 }
