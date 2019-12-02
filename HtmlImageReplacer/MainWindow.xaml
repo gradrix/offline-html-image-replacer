@@ -4,42 +4,63 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Offline HTML Image Replacer" Height="387.6" Width="611.2" Icon="Img.ico" ResizeMode="NoResize" AllowDrop="True">
+        Title="Offline HTML Image Replacer" Height="387.6" Width="611.2" Icon="Img.ico" ResizeMode="NoResize" AllowDrop="True" WindowStartupLocation="CenterScreen">
     <Grid Drop="Grid_Drop" AllowDrop="True" DragOver="Grid_DragOver" Background="#FFEAEAEA" HorizontalAlignment="Stretch" DockPanel.Dock="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="135*"/>
+            <RowDefinition Height="224*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="438*"/>
+            <ColumnDefinition Width="317*"/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="121*"/>
             <ColumnDefinition Width="167*"/>
         </Grid.ColumnDefinitions>
-        <Label Content="Html File location:" Margin="10,32,322.6,0" VerticalAlignment="Top"/>
-        <Rectangle x:Name="HtmlFileRectangle" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="66" Margin="140,0,0,281.6" Stroke="Black" VerticalAlignment="Bottom" Width="342" Grid.ColumnSpan="2"/>
-        <TextBlock x:Name="HtmlFileLocationLabel" TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" Margin="151,15,0,0" VerticalAlignment="Top" Width="331" Grid.ColumnSpan="2" Height="61">
-            Drag &amp; Drop HTML file here or click &quot;Choose HTML&quot;
+        <Label Content="Html File Location:" Margin="10,32,177,0" VerticalAlignment="Top"/>
+        <Rectangle x:Name="HtmlFileRectangle" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="66" Margin="140,0,0,58" Stroke="Black" VerticalAlignment="Bottom" Width="342" Grid.ColumnSpan="5"/>
+        <TextBlock x:Name="HtmlFileLocationLabel" TextWrapping="WrapWithOverflow" Margin="150,16,124,58" Grid.ColumnSpan="5">
+            Drag &amp; Drop HTML file or click &quot;Choose HTML&quot;
         </TextBlock>
-        <Button x:Name="ChooseHtmlButton" Content="Choose HTML" Margin="63.8,28,10.8,0" VerticalAlignment="Top" Height="34" Click="ChooseHtmlButton_Click" Grid.Column="1"/>
-        <Label Content="New Image Location:" Margin="10,117,306.6,0" VerticalAlignment="Top"/>
-        <Rectangle x:Name="ImgFileRectangle" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="66" Margin="140,98,0,0" Stroke="Black" VerticalAlignment="Top" Width="342" Grid.ColumnSpan="2"/>
-        <TextBlock x:Name="ImgFileLocationTextBlock" TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" Margin="151,104,0,0" VerticalAlignment="Top" Width="331" Grid.ColumnSpan="2" Height="60">
-            Drag &amp; Drop IMG file here or click &quot;Choose IMG&quot;
+        <Button x:Name="ChooseHtmlButton" Content="Choose HTML" Margin="64,28,11,0" VerticalAlignment="Top" Height="34" Click="ChooseHtmlButton_Click" Grid.Column="4"/>
+        <Label Content="New Image Location:" Margin="10,117,177,0" VerticalAlignment="Top" Grid.RowSpan="2"/>
+        <Rectangle x:Name="ImgFileRectangle" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="66" Margin="140,98,0,0" Stroke="Black" VerticalAlignment="Top" Width="342" Grid.ColumnSpan="5" Grid.RowSpan="2"/>
+        <TextBlock x:Name="ImgFileLocationTextBlock" TextWrapping="WrapWithOverflow" Margin="150,104,0,195" Grid.ColumnSpan="5" Grid.RowSpan="2" HorizontalAlignment="Left" Width="331">
+            Drag &amp; Drop IMG file or click &quot;Choose IMG&quot;
         </TextBlock>
-        <Button x:Name="ChooseImgButton" Content="Choose IMG" Margin="63.8,113,10.8,0" VerticalAlignment="Top" Height="34" Click="ChooseImgButton_Click" Grid.Column="1"/>
-        <Label Content="Old Image Name:" Margin="14,181,302.6,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="OldImgNameTextBox" HorizontalAlignment="Left" Height="36" Margin="140,181,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" Grid.ColumnSpan="2"/>
-        <TextBlock IsHitTestVisible="False" Text="Enter full image name from &quot;inspect element&quot; to replace" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="151,222,0,107.6" Foreground="DarkGray" Height="28" Grid.ColumnSpan="2" Width="306">
+        <Button x:Name="ChooseImgButton" Content="Choose IMG" Margin="64,113,11,0" VerticalAlignment="Top" Height="34" Click="ChooseImgButton_Click" Grid.Column="4" Grid.RowSpan="2"/>
+        <Label Content="Target Image Name:" Margin="10,52,186,0" VerticalAlignment="Top" Grid.Row="1"/>
+        <TextBox x:Name="OldImgNameTextBox" HorizontalAlignment="Left" Height="36" Margin="140,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" Grid.ColumnSpan="5" Grid.Row="1"/>
+        <TextBlock IsHitTestVisible="False" Text="Enter target image name to replace. E.g. catalog.jpg, 500.gif" VerticalAlignment="Top" Margin="150,57,0,0" Foreground="DarkGray" Grid.ColumnSpan="5" Height="21" Grid.Row="1" HorizontalAlignment="Left" Width="322">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Text, ElementName=OldImgNameTexBox}" Value="">
+                        <DataTrigger Binding="{Binding Text, ElementName=OldImgNameTextBox}" Value="">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <Button x:Name="ResetHtmlButton" Content="Reset HTML" Margin="10,305,336.6,18.6" Click="ResetHtmlButton_Click"/>
-        <Button x:Name="TestHtmlButton" Content="Test that HTML" Margin="64.4,305,9.8,18.6" Grid.Column="1" Click="TestHtmlButton_Click"/>
-        <TextBlock TextWrapping="WrapWithOverflow" x:Name="ErrorTextBlock" HorizontalAlignment="Right" Margin="0,277,122.8,9.6" Width="342" Foreground="Red" ScrollViewer.VerticalScrollBarVisibility="Hidden" Grid.ColumnSpan="2"/>
-        <Button x:Name="ReplaceButton" Content="Replace" Grid.Column="1" HorizontalAlignment="Left" Margin="63.4,184,0,0" VerticalAlignment="Top" Width="93" Height="33" Click="ReplaceButton_Click"/>
-        <TextBlock TextWrapping="WrapWithOverflow" x:Name="SuccessTextBlock" HorizontalAlignment="Right" Margin="0,232,123.8,85.6" Width="342" Foreground="Green" ScrollViewer.VerticalScrollBarVisibility="Hidden" Grid.ColumnSpan="2"/>
+        <Button x:Name="ResetHtmlButton" Content="Reset HTML" Margin="10,170,216,19" Click="ResetHtmlButton_Click" Grid.Row="1"/>
+        <Button x:Name="TestHtmlButton" Content="Test that HTML" Margin="64,170,10,19" Grid.Column="4" Click="TestHtmlButton_Click" Grid.Row="1"/>
+        <Button x:Name="ReplaceButton" Content="Replace" Grid.Column="4" HorizontalAlignment="Left" Margin="63,49,0,0" VerticalAlignment="Top" Width="93" Height="33" Click="ReplaceButton_Click" Grid.Row="1"/>
+        <TabControl TabStripPlacement="Left" Margin="140,89,133,10" Grid.ColumnSpan="5" Grid.Row="1">
+            <TabItem Name="OutputTab" Header="Output">
+                <TabItem.Content>
+                    <ScrollViewer Grid.ColumnSpan="5" Margin="0,0,0,0" Grid.Row="1">
+                        <TextBlock TextWrapping="WrapWithOverflow" x:Name="SuccessTextBlock" HorizontalAlignment="Right" Width="245" Foreground="Green" ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+                    </ScrollViewer>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem Name="ErrorTab" Header="Errors">
+                <TabItem.Content>
+                    <ScrollViewer Grid.ColumnSpan="5" Margin="0,0,0,0" Grid.Row="1">
+                        <TextBlock TextWrapping="WrapWithOverflow" x:Name="ErrorTextBlock" HorizontalAlignment="Right" Width="245" Foreground="Red" ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+                    </ScrollViewer>
+                </TabItem.Content>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
