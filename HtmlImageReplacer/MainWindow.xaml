@@ -46,18 +46,18 @@
         <Button x:Name="ResetHtmlButton" Content="Reset HTML" Margin="10,170,216,19" Click="ResetHtmlButton_Click" Grid.Row="1"/>
         <Button x:Name="TestHtmlButton" Content="Test that HTML" Margin="64,170,10,19" Grid.Column="4" Click="TestHtmlButton_Click" Grid.Row="1"/>
         <Button x:Name="ReplaceButton" Content="Replace" Grid.Column="4" HorizontalAlignment="Left" Margin="63,49,0,0" VerticalAlignment="Top" Width="93" Height="33" Click="ReplaceButton_Click" Grid.Row="1"/>
-        <TabControl TabStripPlacement="Left" Margin="140,89,133,10" Grid.ColumnSpan="5" Grid.Row="1">
+        <TabControl TabStripPlacement="Left" Margin="140,89,123,10" Grid.ColumnSpan="5" Grid.Row="1">
             <TabItem Name="OutputTab" Header="Output">
                 <TabItem.Content>
-                    <ScrollViewer Grid.ColumnSpan="5" Margin="0,0,0,0" Grid.Row="1">
-                        <TextBlock TextWrapping="WrapWithOverflow" x:Name="SuccessTextBlock" HorizontalAlignment="Right" Width="245" Foreground="Green" ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+                    <ScrollViewer Grid.ColumnSpan="5" Margin="0,0,0,0" Grid.Row="1" HorizontalAlignment="Right" Width="284">
+                        <TextBlock TextWrapping="WrapWithOverflow" x:Name="SuccessTextBlock" HorizontalAlignment="Right" Width="250" Foreground="Green" ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
                     </ScrollViewer>
                 </TabItem.Content>
             </TabItem>
             <TabItem Name="ErrorTab" Header="Errors">
                 <TabItem.Content>
-                    <ScrollViewer Grid.ColumnSpan="5" Margin="0,0,0,0" Grid.Row="1">
-                        <TextBlock TextWrapping="WrapWithOverflow" x:Name="ErrorTextBlock" HorizontalAlignment="Right" Width="245" Foreground="Red" ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+                    <ScrollViewer Grid.ColumnSpan="5" Margin="0,0,0,0" Grid.Row="1" HorizontalAlignment="Right" Width="284">
+                        <TextBlock TextWrapping="WrapWithOverflow" x:Name="ErrorTextBlock" HorizontalAlignment="Right" Width="250" Foreground="Red" ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
                     </ScrollViewer>
                 </TabItem.Content>
             </TabItem>
